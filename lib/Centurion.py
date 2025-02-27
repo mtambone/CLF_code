@@ -34,6 +34,7 @@ class Centurion:
                 return response
             except serial.SerialException: 
                 print(f"CENT:READ_R:ERROR:Unable to read response")
+                return -1
         return ""
 
     def send_command(self, command):
@@ -63,6 +64,7 @@ class Centurion:
             self.serial_port.reset_input_buffer()
             self.serial_port.reset_output_buffer()
             time.sleep(0.1)
+            return 0
 
         
         except Exception as e:
