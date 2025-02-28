@@ -172,7 +172,7 @@ class Centurion:
         if status:
             parts = status.split()
 
-            if len(parts) == 5 and parts[0] == '$STATUS':
+            if len(parts) == 5 and parts[0] == '$STATU':
                 try:
                     self.sbyte = int(parts[1], 16) 
                     self.hbyte1 =  int(parts[2], 16) 
@@ -255,7 +255,7 @@ class Centurion:
         temps = self.send_command("$TEMPS ?")
         if temps: 
             parts = temps.split()
-            if len(parts) == 4 and parts[0] == '$SHOTS':
+            if len(parts) == 4 and parts[0] == '$TEMPS':
                     
                 try:
                     self.head_temp = int(parts[1], 16)
@@ -263,14 +263,15 @@ class Centurion:
                     self.plate_temp = int(parts[3], 16)
 
                     print(f"CENT:CHECK_TEMPS:TEMPS:head:{self.head_temp}, dump:{self.dump_temp}, plate:{self.plate_temp}")
-                
+                    return 0
+
                 except ValueError:
                     print(f"CENT:CHECK_TEMPS:ERROR:BYTE RECEIVED {temps}")
                     return -1
             else:
                 print(f"CENT:CHECK_TEMPS:ERROR:Bytes received: {temps}")  
                 return -1        
-        return 0
+        
     
     def check_qs_delay(self):
 
