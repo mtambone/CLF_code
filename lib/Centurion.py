@@ -180,6 +180,7 @@ class Centurion:
                     self.hbyte3 = int(parts[4], 16)
 
                     print(f"CENT:READ_BYTES:{self.sbyte}, {self.hbyte1}, {self.hbyte2}, {self.hbyte3}")
+                    return 0 
 
                 except ValueError:
                     print(f"CENT:READ_BYTES:ERROR:Bytes received: {status}")
@@ -222,10 +223,12 @@ class Centurion:
                 print(f"CENT:WARMUP:Q-Swithc:{q_switch}")
 
             self.read_bytes()
+            return 0 
 
         
         except Exception as e:
             print(f"CENT:WARMUP:ERROR:Some problem occurred: {e}")
+            return -1
 
     def sleep(self):
 
