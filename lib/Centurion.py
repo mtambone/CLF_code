@@ -15,6 +15,17 @@ class Centurion:
         self.port = port
         self.baudrate = baudrate
         self.serial = None
+        self.pulse_wdth = -99
+        self.sbyte = 255
+        self.hbyte1 = 255
+        self.hbyte2 = 255
+        self.hbyte3 = 255
+        self.hbyte4 = 255
+        self.head_temp = -99
+        self.dump_temp = -99
+        self.plate_temp = -99 
+
+
 
     def connect(self):
 
@@ -161,11 +172,6 @@ class Centurion:
 
     def read_bytes(self):
 
-        self.sbyte = 255
-        self.hbyte1 = 255
-        self.hbyte2 = 255
-        self.hbyte3 = 255
-        self.hbyte4 = 255
 
         self.flush_buffers()
         status = self.send_command("$STATU")
@@ -180,8 +186,7 @@ class Centurion:
                     self.hbyte3 = int(parts[4], 16)
 
                     print(f"CENT:READ_BYTES:{self.sbyte}, {self.hbyte1}, {self.hbyte2}, {self.hbyte3}")
-                    return 0 
-
+                    
                 except ValueError:
                     print(f"CENT:READ_BYTES:ERROR:Bytes received: {status}")
                     return -1
@@ -200,7 +205,7 @@ class Centurion:
         if response:
             print(f"CENT:READ_BYTES:User shots counter:{response}")
 
-        return 0        
+        return 0     
           
     def warmup(self):
 
@@ -248,10 +253,6 @@ class Centurion:
             return -1
             
     def check_temps(self):
-
-        self.head_temp = -99
-        self.dump_temp = -99
-        self.plate_temp = -99 
 
         self.flush_buffers()
 
@@ -315,10 +316,8 @@ class Centurion:
     def fire(self):
 
         self.flush_buffers()
-        #checking for status
         status = self.check_parameter("$STATU")
 
-        #if not in standby:
         while status != 7:
             self.send_command("$STAND")
             status = self.check_parameter("$STATU")
