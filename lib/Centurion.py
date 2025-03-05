@@ -42,6 +42,7 @@ class Centurion:
         if self.serial and self.serial.is_open:
             try:
                 response = self.serial.read(CENTURION_RETURN).decode(errors='ignore').strip()
+                response = str(response)
                 return response
             except serial.SerialException: 
                 print(f"CENT:READ_R:ERROR:Unable to read response")
@@ -175,7 +176,7 @@ class Centurion:
 
         self.flush_buffers()
         status = self.send_command("$STATU")
-        status = str(status)
+        
         if status:
             parts = status.split()
 
