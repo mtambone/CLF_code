@@ -16,6 +16,7 @@ class Centurion:
         self.baudrate = baudrate
         self.serial = None
         self.pulse_wdth = -99
+        self.state = 255
         self.sbyte = 255
         self.hbyte1 = 255
         self.hbyte2 = 255
@@ -30,7 +31,7 @@ class Centurion:
     def connect(self):
 
         try:
-            self.serial = serial.Serial(self.port, self.baudrate, timeout = CENTURION_WAIT)
+            self.serial = serial.Serial(self.port, self.baudrate, timeout = 5, parity = serial.PARITY_EVEN)
             print(f"CENT:CONN:Connected to {self.port} at {self.baudrate} baud")
             return 0 
         except serial.SerialException as e:
@@ -41,8 +42,8 @@ class Centurion:
 
         if self.serial and self.serial.is_open:
             try:
-                response = self.serial.read(CENTURION_RETURN).decode(errors='ignore').strip()
-                response = str(response)
+                response = str(self.serial.read(CENTURION_RETURN).decode(errors='ignore').strip())
+                
                 return response
             except serial.SerialException: 
                 print(f"CENT:READ_R:ERROR:Unable to read response")
@@ -55,8 +56,6 @@ class Centurion:
             try:
                 self.serial.flushInput()
                 self.serial.write(f"{command}\r".encode())
-                time.sleep(0.5)
-                self.serial.write(b"y\r")
                 time.sleep(0.5)
 
                 response = self.read_response()
@@ -73,8 +72,8 @@ class Centurion:
     def flush_buffers(self):
 
         try:
-            self.serial_port.reset_input_buffer()
-            self.serial_port.reset_output_buffer()
+            self.serial.reset_input_buffer()
+            self.serial.reset_output_buffer()
             time.sleep(0.1)
             return 0
 
@@ -97,13 +96,13 @@ class Centurion:
         
         
         #response = self.read_response()
-        print(f"CENT:COMM_TEST: received: {response}")
+        print(f"CENT:COMM_TEST:received:{response}")
         
         if response.startswith("$HVERS"):
-            print("CENT:COMM_TEST: PASSED OK!")
+            print("CENT:COMM_TEST:PASSED OK!")
             return 0
         else:
-            print("CENT:COMM_TEST: Failed")
+            print("CENT:COMM_TEST:Failed")
             return -1
 
     def set_parameter(self, parameter, value):
@@ -113,7 +112,7 @@ class Centurion:
         if parameter_set:
             preturn = parameter_set.split()
 
-            if preturn == 2 and preturn[0] == f"{parameter}":
+            if len(preturn) == 2 and preturn[0] == f"{parameter}":
                 print(f"CENT:PARAMETER_SET:Parameter {preturn[0]}, value set: {preturn[1]}")
                 return 0
             else:
@@ -127,7 +126,7 @@ class Centurion:
         if parameter_check:
             preturn = parameter_check.split()
 
-            if preturn == 2 and preturn[0] == f"{parameter}":
+            if len(preturn) == 2 and preturn[0] == f"{parameter}":
                 print(f"CENT:PARAMETER_CHECK:Parameter {preturn[0]}, value checked: {preturn[1]}")
                 return preturn[1]
             else:
@@ -139,53 +138,76 @@ class Centurion:
         try:
 
             print("CENT:SET_MODE:Setting up Centurion Laser...")
+            print("CENT:SET_MODE:Going Standby...")
+            self.send_command("$STANDBY")
             #setting frequency (100 == 2Hz)
             self.set_parameter("$DFREQ", freq)
             #setting diodes (off = 0, enabled = 1) 
-            self.set_parameter("$DIODES", diode)
+            self.set_parameter("$DIODE", diode)
             #setting Q-switch (off = 0, enabled = 1)
             self.set_parameter("$QSON", qson)
             #setting laser to be Q-switched (long pulse = 0, Q-switched = 1)
-            self.set_parameter("$QSWITCH", qswitch)
+            self.set_parameter("$QSWIT", qswitch)
             #setting diode trigger in external mode (internal = 0, external = 1)
             self.set_parameter("$DTRIG", dtrig)
             #setting Q-swicth trigger to external mode (internal = 0, external = 1)
-            self.set_parameter("$QSTRIG", qstrig)
+            self.set_parameter("$QSTRI", qstrig)
             #setting diodes pulse (energy of the laser)
             self.set_parameter("$DPW", dpw)
             #setting delay for Q-switch (relevant only for internal trigger)
-            self.set_parameter("$QSDELAY", qsdelay)
-            print("CENT:SET_MODE:Checking values:")
-            self.check_parameter("$DFREQ")
-            self.check_parameter("$DIODES")
-            self.check_parameter("$QSON")
-            self.check_parameter("$QSWITCH")
-            self.check_parameter("$DTRIG")
-            self.check_parameter("$QSTRIG")
-            self.check_parameter("$DPW")
-            self.check_parameter("$QSDELAY")
+            self.set_parameter("$QSDEL", qsdelay)
+            # print("CENT:SET_MODE:Checking values:")
+            # self.check_parameter("$DFREQ")
+            # self.check_parameter("$DIODE")
+            # self.check_parameter("$QSON")
+            # self.check_parameter("$QSWIT")
+            # self.check_parameter("$DTRIG")
+            # self.check_parameter("$QSTRI")
+            # self.check_parameter("$DPW")
+            # self.check_parameter("$QSDEL")
 
             print("CENT:SET_MODE:Set up complete")
             return 0 
 
-        except:
+        except Exception as e:
+            print(f"CENT:SET_MODE:ERROR:Some problem occurred: {e}")
             return -1 
 
-    def read_bytes(self):
-
+    def read_status(self):
 
         self.flush_buffers()
-        status = self.send_command("$STATU")
+        status = self.send_command("$STATUS ?")
         
         if status:
             parts = status.split()
 
-            if len(parts) == 5 and parts[0] == '$STATU':
+            if len(parts) == 6 and parts[0] == '$STATUS':
                 try:
-                    self.sbyte = int(parts[1], 16) 
-                    self.hbyte1 =  int(parts[2], 16) 
-                    self.hbyte2 = int(parts[3], 16) 
-                    self.hbyte3 = int(parts[4], 16)
+                    self.state = int(parts[1], 16) 
+
+                except ValueError:
+                    print(f"CENT:READ_STATUS:ERROR:Bytes received: {status}")
+                    return -1
+
+            else:
+                print(f"CENT:READ_STATUS:ERROR:WRONG STRING RECEIVED:Bytes received: {status}")  
+                return -1   
+
+
+    def read_bytes(self):
+
+        self.flush_buffers()
+        status = self.send_command("$STATUS ?")
+        
+        if status:
+            parts = status.split()
+
+            if len(parts) == 6 and parts[0] == '$STATUS':
+                try:
+                    self.sbyte = int(parts[2], 16) 
+                    self.hbyte1 =  int(parts[3], 16) 
+                    self.hbyte2 = int(parts[4], 16) 
+                    self.hbyte3 = int(parts[5], 16)
 
                     print(f"CENT:READ_BYTES:{self.sbyte}, {self.hbyte1}, {self.hbyte2}, {self.hbyte3}")
                     
@@ -194,7 +216,7 @@ class Centurion:
                     return -1
 
             else:
-                print(f"CENT:READ_BYTES:ERROR:Bytes received: {status}")  
+                print(f"CENT:READ_BYTES:ERROR:WRONG STRING RECEIVED:Bytes received: {status}")  
                 return -1   
 
         print("CENT:READ_BYTES:Requesting shot counter")
@@ -214,12 +236,12 @@ class Centurion:
         self.flush_buffers()
 
         try:
-            print("CENT:WARMUP:Going Standby")
+            print("CENT:WARMUP:Going Standby...")
             standby = self.send_command('$STAND')
             if standby: 
                 print(f"CENT:WARMUP:Standby:{standby}")
 
-            print("CENT:WARMUP:Turning On Diodes")
+            print("CENT:WARMUP:Turning On Diodes...")
             diode_on = self.send_command('$DIODE 1')
             if diode_on:
                 print(f"CENT:WARMUP:Diodes:{diode_on}")
