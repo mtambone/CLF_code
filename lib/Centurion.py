@@ -175,6 +175,7 @@ class Centurion:
 
         self.flush_buffers()
         status = self.send_command("$STATU")
+        status = str(status)
         if status:
             parts = status.split()
 
