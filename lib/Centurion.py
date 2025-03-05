@@ -340,9 +340,9 @@ class Centurion:
     def fire(self):
 
         self.flush_buffers()
-        status = self.check_parameter("$STATU")
+        status = self.read_status("$STATU")
 
-        while status != 7:
+        while status != "7e":
             self.send_command("$STAND")
             status = self.check_parameter("$STATU")
 
