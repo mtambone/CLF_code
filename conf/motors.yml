@@ -1,0 +1,12 @@
+
+NorthSud:
+  port: "FTDI:1"
+  id: 0
+
+Cover:
+  port: "FTDI:1"
+  id: 1
+
+EastWest:
+  port: "FTDI:1"
+  id: 2
