@@ -37,6 +37,7 @@ class Rad_Monitor_3700:
         if self.serial and self.serial.is_open:
             try:
                 response = self.serial.read(RADIOMETER_RETURN).decode(errors='ignore')
+                response = str(response)
                 return response
             except serial.SerialException:
                 print("RADM_MON_3700:ERROR:Unable to read response")

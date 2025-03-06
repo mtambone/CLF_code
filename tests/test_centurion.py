@@ -2,7 +2,17 @@
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from lib.Centurion import Centurion
+import time
+
+lib_path = os.path.abspath('/home/tambone/Desktop/Matteo/CLF_code/lib')
+
+# Append it to sys.path
+sys.path.append(lib_path)
+
+
+from Centurion import Centurion
 
 c = Centurion("/dev/ttyr00")
+c.connect()
+time.sleep(1)
+c.read_bytes()

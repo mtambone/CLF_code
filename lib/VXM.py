@@ -35,6 +35,7 @@ class VXM:
         if self.serial and self.serial.is_open:
             try:
                 response = self.serial.read(VXM_RETURN).decode(errors='ignore').strip()
+                response = str(response)
                 return response
             except serial.SerialException: 
                 print(f"VXM:READ_R:ERROR:Unable to read response")
