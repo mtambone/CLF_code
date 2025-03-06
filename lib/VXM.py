@@ -31,7 +31,6 @@ class VXM:
         #POSY 8677   modified by Kevin and Carlos on Mar 2017
         self.POSY = 8598
 
-
     def read_command(self):   
 
         if self.serial and self.serial.is_open:
@@ -108,14 +107,11 @@ class VXM:
             print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}: {e}")
             return -2
         
-########prove funzioni#############
-
     def set_model(self, motor, model):
         
         self.flush_buffers()
         ready = self.send_command(f"setM{motor}M{model}")
         
-
         if ready and ready== "^":
             print(f"VXM:SET_MODEL:VXM at {self.port}:Motor {motor} model set: {model}")
             return 0
@@ -276,9 +272,7 @@ class VXM:
                 return -1
         except Exception as e:
             print(f"VXM:MOVE_ABS0:ERROR:VXM at {self.serial}:unable to move motor {motor} in absolute 0 position:{e}")
-
-        
-            
+              
     def move_ABS(self, motor, abs_pos):
 
         self.flush_buffers()

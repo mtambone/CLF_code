@@ -164,7 +164,7 @@ class Centurion:
             return 0 
 
         except Exception as e:
-            print(f"CENT:SET_MODE:ERROR:Some problem occurred: {e}")
+            print(f"CENT:SET_MODE:ERROR:Some problem occurred:{e}")
             return -1 
         
     def check_mode(self):
@@ -185,7 +185,6 @@ class Centurion:
             print("CENT:CHECK_MODE:ERROR:Some problem occurred")
             return -2
 
-
     def read_status(self):
 
         self.flush_buffers()
@@ -205,7 +204,6 @@ class Centurion:
             else:
                 print(f"CENT:READ_STATUS:ERROR:WRONG STRING RECEIVED:Bytes received: {status}")  
                 return -2  
-
 
     def read_bytes(self):
 
@@ -313,7 +311,6 @@ class Centurion:
                 print(f"CENT:CHECK_TEMPS:ERROR:Bytes received: {temps}")  
                 return -2        
         
-    
     def check_qs_delay(self):
 
         self.flush_buffers()
