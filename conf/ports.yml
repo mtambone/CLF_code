@@ -1,0 +1,16 @@
+
+FTDI:1:
+  port: "/dev/ttyr09"
+  speed: 115200
+  bytesize: 8
+  parity: 'N'
+  stopbits: 1
+  timeout: 1
+
+MOXA:3:
+  port: "/dev/ttyr00"
+  speed: 115200
+  bytesize: 8
+  parity: 'N'
+  stopbits: 1
+  timeout: 1
