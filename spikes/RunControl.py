@@ -8,7 +8,7 @@ from datetime import datetime
 import time
 
 
-rc = FPGARunControl("COM13")
+rc = FPGARunControl("/dev/runcontrol")
 rc.connect()
 
 
@@ -38,7 +38,7 @@ def align_unix_time():
 
 def set_laser_frequency(freq):
      periodo =int((1/freq)*100_000_000)
-     rc.write_register(27, periodo & 0xFFFF)
+     rc.write_register(27, (periodo & 0xFFFF)-2)
      time.sleep(0.1)
      rc.write_register(28, (periodo >> 16)& 0xFFFF)
 
@@ -52,7 +52,7 @@ def set_laser_shots(shots):
       rc.write_register(4, 65535) 
       print('Maximum 65535 shots, update will come soon')
 
-set_laser_shots(100)
+set_laser_shots(20)
 
 def set_laser_energy_us(delay_us):
      var=(delay_us*100)
@@ -60,7 +60,7 @@ def set_laser_energy_us(delay_us):
      time.sleep(0.1)
      rc.write_register(15, (var >> 16)& 0xFFFF)
 
-set_laser_energy_us(140)
+set_laser_energy_us(50)
 
 
 rc.write_register(3, 3)
