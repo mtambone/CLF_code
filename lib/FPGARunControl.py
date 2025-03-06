@@ -18,11 +18,11 @@ class FPGARunControl:
       self.serial.close()
 
    def read_register(self, addr):
-      self.serial.write(f"{addr}\r".encode())
+      self.serial.write(f"{str(hex(addr))[2:]}\r".encode())
       return int(self.serial.read_until('\r'.encode()).decode()[:-1], 16)
          
    def write_register(self, addr, value):
-      self.serial.write(f"{addr} {str(hex(value))[2:]}\r".encode())
+      self.serial.write(f"{str(hex(addr))[2:]} {str(hex(value))[2:]}\r".encode())
 
    
 

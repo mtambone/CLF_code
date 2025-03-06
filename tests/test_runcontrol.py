@@ -12,10 +12,10 @@ print("1. dump FPGA registers (0-16)")
 for reg in range(0,16):
    print(hex(rc.read_register(reg)))
 
-print("2. write 0xABCD in register 4")
-rc.write_register(4, 0xABCD)
+print("2. write 0xABCD in register 13")
+rc.write_register(13, 0xABCD)
 
-print("3. read register 4")
-print(hex(rc.read_register(4)))
+print("3. read register 13")
+print(hex(rc.read_register(13)))
 
 rc.close()
