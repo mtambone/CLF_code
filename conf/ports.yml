@@ -7,6 +7,14 @@ FTDI:1:
   stopbits: 1
   timeout: 1
 
+FTDI:2:
+  port: "/dev/ttyUSB1"
+  speed: 115200
+  bytesize: 8
+  parity: 'N'
+  stopbits: 1
+  timeout: 1
+
 MOXA:3:
   port: "/dev/ttyUSB0"
   speed: 115200
