@@ -12,12 +12,9 @@ BUFSIZE = 255         #input, output buffer size */
 
 class Centurion:
 
-    def __init__(self, port, baudrate, timeout, parity = serial.PARITY_NONE, string_return = 255):
+    def __init__(self, port, baudrate = 57600, timeout = 5, parity = serial.PARITY_EVEN, string_return = 255):
         self.port = port
-        self.baudrate = baudrate
         self.serial = None
-        self.timeout = timeout
-        self.parity = parity
         self.string_return = string_return
 
         #const
@@ -32,15 +29,18 @@ class Centurion:
         self.dump_temp = -99
         self.plate_temp = -99 
 
-    def connect(self):
-
-        try:
-            self.serial = serial.Serial(self.port, self.baudrate, self.timeout, self.parity)
-            print(f"CENT:CONN:Connected to {self.port} at {self.baudrate} baud")
-            return 0 
-        except serial.SerialException as e:
-            print(f"CENT:CONN:Unable to reach the device {self.port}: {e}")
-            return -2
+        if isinstance(port, str):
+            try:
+                self.serial = serial.Serial(port, baudrate, timeout, parity)
+                print(f"CENT:CONN:Connected to {port} at {baudrate} baud")
+            except serial.SerialException as e:
+                print(f"CENT:CONN:Unable to reach the device {port}: {e}")
+                raise e
+        elif isinstance(port, serial.Serial):
+            self.serial = port
+            self.port = self.serial.port
+        else:
+            raise TypeError
 
     def read_response(self):   
 
@@ -362,9 +362,12 @@ class Centurion:
            
 
 if __name__ == "__main__":
+    c = Centurion("/dev/ttyUSB0", 57600, 5, serial.PARITY_EVEN, 255)
 
-    c= Centurion("/dev/ttyr00", 57600, 5, serial.PARITY_EVEN, 255)
-    c.connect()
+    # usage with serial object as parameter
+    #s = serial.Serial("/dev/ttyUSB0", 57600)
+    #c = Centurion(s)
+
     c.check_temps()
     c.warmup()
     c.fire()
