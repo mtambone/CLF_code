@@ -1,17 +1,16 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from lib.Config import Configuration
-from lib.Collections import MotorCollection
+from lib.Configuration import Configuration
+from lib.DeviceCollection import DeviceCollection
 
 cfg = Configuration()
 cfg.read()
 
-# configure motors
-mc = MotorCollection()
-for mname, mparams in cfg.motors.items():
-    port_params = cfg.get_port_params(mparams['port'])
-    mc.add(mparams['id'], mname, 
+dc = DeviceCollection()
+for oname, oparams in cfg.outlets.items():
+    port_params = cfg.get_port_params(oparams['port'])
+    dc.add_outlet(oparams['id'], oname,
            port=port_params['port'],
            speed=port_params['speed'],
            bytesize=port_params['bytesize'],
@@ -20,7 +19,5 @@ for mname, mparams in cfg.motors.items():
            timeout=port_params['timeout']
     )
 
-print(mc)
-
-mc.get("NorthSud").move(10)
+dc.get_outlet("RAMAN2").on()
 
