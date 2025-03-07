@@ -13,6 +13,5 @@ sys.path.append(lib_path)
 from Centurion import Centurion
 
 c = Centurion("/dev/ttyr00")
-c.connect()
 time.sleep(1)
 c.read_bytes()
