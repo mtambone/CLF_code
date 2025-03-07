@@ -16,17 +16,22 @@ RPC_VXM = 6
 
 class RPCDevice:
     def __init__(self, port, baudrate=9600):
-        self.port = port
-        self.baudrate = baudrate
+        self.port = None
         self.serial = None
         self.status = [-1] * 7  # Stato iniziale sconosciuto
 
-    def connect(self):
-        try:
-            self.serial = serial.Serial(self.port, self.baudrate, timeout=RPC_WAIT)
-            print(f"RPC:CONN: Connected to {self.port} at {self.baudrate} baud.")
-        except serial.SerialException as e:
-            print(f"RPC:CONN: Unable to open device {self.port}: {e}")
+        if isinstance(port, str):
+            self.port = port
+            try:
+                self.serial = serial.Serial(self.port, baudrate, timeout=RPC_WAIT)
+                print(f"RPC:CONN: Connected to {self.port} at {baudrate} baud.")
+            except serial.SerialException as e:
+                print(f"RPC:CONN: Unable to open device {self.port}: {e}")
+        elif isinstance(port, serial.Serial):
+            self.serial = port
+            self.port = self.serial.port
+        else:
+            raise TypeError
 
     def send_command(self, command):
         if self.serial and self.serial.is_open:
@@ -115,7 +120,10 @@ class RPCDevice:
 
 if __name__ == "__main__":
     rpc = RPCDevice('/dev/ttyUSB0')  # Modifica la porta se necessario
-    rpc.connect()
+
+    # usage with serial object as parameter
+    #s = serial.Serial('/dev/ttyUSB0')
+    #rpc = RPCDevice(s)
     
     outlet = 1  # Cambia l'outlet da controllare
     print(f"Accensione outlet {outlet}:", rpc.rpc_on(outlet))
