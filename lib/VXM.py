@@ -7,12 +7,9 @@ VMX_WAIT = 800000
 
 class VXM:
 
-    def __init__(self, port, baudrate, timeout, parity = serial.PARITY_NONE, string_return= 255):
-        self.port=port
-        self.baudrate = baudrate
-        self.serial= None
-        self.timeout = timeout
-        self.parity = parity 
+    def __init__(self, port, baudrate = 9600, timeout = VMX_WAIT, parity = serial.PARITY_NONE, string_return= 255):
+        self.port = None
+        self.serial = None
         self.string_return = string_return
         ####vxm conf####
 
@@ -26,10 +23,43 @@ class VXM:
         #POSX 2902 changed by medina Y15M04D28
         self.POSX = 2974
 
-
         #VERTICAL number of step from limit swit to zero (horizontal plane)
         #POSY 8677   modified by Kevin and Carlos on Mar 2017
         self.POSY = 8598
+
+        if isinstance(port, str):
+            self.port = port
+            try:
+                self.serial = serial.Serial(self.port, baudrate, timeout=timeout, parity=parity)
+                
+                self.flush_buffers()
+                self.send_command("E")
+                self.send_command("C")
+                self.send_command("V")
+
+                ready = self.read_command()
+                if ready == "R": 
+                    print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
+                else: 
+                    for i in range(0, 10):
+                        ready = self.read_command()
+                        print(f"VXM:CONNECT:Attempt {i}, response: {ready}")
+                        if ready == "R":
+                            print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
+                        else:
+                            print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}. Trying again...")
+                    
+                    print("VXM:CONNECT:ERROR:Maximum number of trial exceeded")
+                    raise TimeoutError
+                    
+            except serial.SerialException as e:
+                print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}: {e}")
+                raise e
+        elif isinstance(port, serial.Serial):
+            self.serial = port
+            self.port = self.serial.port
+        else:
+            raise TypeError
 
     def read_command(self):   
 
@@ -51,7 +81,7 @@ class VXM:
                 self.serial.write(f"{command}\r".encode())
                 time.sleep(0.5)
 
-                response = self.read_response()
+                response = self.read_command()
 
                 return response
 
@@ -75,37 +105,6 @@ class VXM:
             print(f"VXM:FLUSH_BUFFERS:Unable to flush buffers: {e}")
             return -1
     
-    def connect(self):
-
-        try:
-            self.serial = serial.Serial(self.port, self.baudrate, timeout=VMX_WAIT)
-            
-            self.flush_buffers()
-            self.send_command("E")
-            self.send_command("C")
-            self.send_command("V")
-
-            ready = self.read_command()
-            if ready == "R": 
-                print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
-                return 0
-            
-            else: 
-                for i in range(0, 10):
-                    ready = self.read_command()
-                    print(f"VXM:CONNECT:Attempt {i}, response: {ready}")
-                    if ready == "R":
-                        print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
-                        return 0
-                    else:
-                        print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}. Trying again...")
-                
-                print("VXM:CONNECT:ERROR:Maximum number of trial exceeded")
-                return -2
-                       
-        except serial.SerialException as e:
-            print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}: {e}")
-            return -2
         
     def set_model(self, motor, model):
         
@@ -327,13 +326,10 @@ class VXM:
             return -1
         
 if __name__ == "__main__":
-    vxm = VXM("/dev/ttyr01", 9600, 2)
-    vxm.connect()
-    vxm.move_ABS()
+    # usage with serial object as parameter
+    #s = serial.Serial("/dev/ttyUSB0", 9600)
+    #vxm = VXM(s)
 
-
-
-
-
-
+    vxm = VXM("/dev/ttyUSB0", 9600, 2)
+    vxm.move_ABS(0, 0)
 

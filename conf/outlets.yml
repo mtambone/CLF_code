@@ -1,5 +1,13 @@
 
 RAMAN1:
-  port: "MOXA:3"
+  port: "FTDI:1"
   id: 4
+
+PC:
+  port: "FTDI:1"
+  id: 5
+
+RAMAN2:
+  port: "FTDI:1"
+  id: 6
 
