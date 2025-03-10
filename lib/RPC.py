@@ -2,7 +2,7 @@ import serial
 import time
 
 # Costanti
-RPC_RETURN = 50
+RPC_RETURN = 255
 RPC_WAIT = 1  # Timeout in secondi
 
 # Stati degli outlet
@@ -119,13 +119,15 @@ class RPCDevice:
                 "6)...vxm       : Off": RPC_VXM
             }
 
-            for line in response.split('\n'):
+            for line in response.split('\n'):                
                 for key, val in outlet_status.items():
                     if key in line:
                         self.state[val] = 1
                 for key, val in outlet_off_status.items():
                     if key in line:
                         self.state[val] = 0
+
+            print(self.state) 
 
             if self.id >= 0 and self.id <= 6:
                 return self.state[self.id]
