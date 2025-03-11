@@ -12,7 +12,7 @@ class Rad_Monitor_3700:
 
         if isinstance(port, str):
             try:
-                self.serial = serial.Serial(self.port, baudrate, timeout = RADIOMETER_WAIT)
+                self.serial = serial.Serial(port, baudrate, timeout = RADIOMETER_WAIT)
                 print(f"RADM_MON_3700:CONN:Connected to {self.port} at {baudrate} baud")
             except serial.SerialException as e:
                 print(f"RADM_MON_3700:Unable to reach the device {self.port}: {e}") 
@@ -25,8 +25,8 @@ class Rad_Monitor_3700:
         
     def flush_buffers(self):
         try:
-            self.serial_port.reset_input_buffer()
-            self.serial_port.reset_output_buffer()
+            self.serial.reset_input_buffer()
+            self.serial.reset_output_buffer()
             time.sleep(0.1)
 
         except Exception as e:
@@ -55,38 +55,33 @@ class Rad_Monitor_3700:
             except serial.SerialException as e:
                     print(f"RADM_MON_3700:SEND_COMM:Unable to send {command} command: {e}")
                     return -1   
-            else:
-                print(f"RADM_MON_3700:SEND_COMM:Serial port is not open")
-                return -1
+        else:
+            print(f"RADM_MON_3700:SEND_COMM:Serial port is not open")
+            return -1
             
     def set_parameter(self, parameter, value):
         parameter_set = self.send_command(f"{parameter} {value}")
 
         if parameter_set:
-            preturn = parameter_set.split()
-
-            if preturn == 2 and preturn[0] == f"{parameter}":
-                print(f"RADM_MON_3700:PARAMETER_SET:Parameter {preturn[0]}, value set: {preturn[1]}")
-                return preturn
+            if parameter_set == "*":
+                print(f"RADM_MON_3700:PARAMETER_SET:Parameter {parameter}, value set: {value}")
+                return 0
             else:
-                print(f"RADM_MON_3700:PARAMETER_SET:ERROR:Unable to set parameter {preturn[0]}")
+                print(f"RADM_MON_3700:PARAMETER_SET:ERROR:Unable to set parameter {parameter}:recived answer{parameter_set}")
                 return -1
 
     def check_parameter(self, parameter):
         parameter_check = self.send_command(f"{parameter} ?")
 
         if parameter_check:
-            preturn = parameter_check.split()
-
-            if preturn == 2 and preturn[0] == f"{parameter}":
-                print(f"RADM_MON_3700:PARAMETER_CHECK:Parameter {preturn[0]}, value checked: {preturn[1]}")
-                return preturn[1]
-            else:
-                print(f"RADM_MON_3700:PARAMETER_CHECK:ERROR:Unable to check parameter {preturn[0]}")
+            print(f"RADM_MON_3700:PARAMETER_CHECK:Parameter {parameter}, value checked: {parameter_check}")
+            return parameter_check
+        else:
+                print(f"RADM_MON_3700:PARAMETER_CHECK:ERROR:Unable to check parameter {parameter}")
                 return -1
 
     def rad_info(self):
-        self.flush_buffers()
+        #self.flush_buffers()
 
         try:
             id = self.send_command("ID")
@@ -104,7 +99,7 @@ class Rad_Monitor_3700:
 
     def rad_set(self):
         try:
-            self.flush_buffers()
+            #self.flush_buffers()
 
             self.set_parameter("TG", 3)
             self.set_parameter("SS", 0)
@@ -116,6 +111,8 @@ class Rad_Monitor_3700:
 
         except Exception as e:
             print(f"RADM_MON_3700:SET_UP:ERROR:Some problem occurred: {e}")
+    
+
 
     def set_range(self, range):
         self.flush_buffers()
