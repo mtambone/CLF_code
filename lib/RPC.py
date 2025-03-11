@@ -2,7 +2,7 @@ import serial
 import time
 
 # Costanti
-RPC_RETURN = 50
+RPC_RETURN = 255
 RPC_WAIT = 1  # Timeout in secondi
 
 # Stati degli outlet
@@ -154,12 +154,12 @@ class RPCDevice:
         self.serial.flushInput()
         self.serial.write(b"\r")
         time.sleep(0.05)
-            if self.id >= 0 and self.id <= 6:
-                return self.state[self.id]
-            elif self.id == 0:
-                return sum(1 for s in self.state if s == 1)
-            else:
-                return -1
+        if self.id >= 0 and self.id <= 6:
+            return self.state[self.id]
+        elif self.id == 0:
+            return sum(1 for s in self.state if s == 1)
+        else:
+            return -1
 
 if __name__ == "__main__":
     # usage with serial object as parameter
