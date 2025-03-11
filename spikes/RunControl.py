@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python4
 
 import sys
 import os
@@ -43,7 +43,7 @@ def set_laser_frequency(freq):
      rc.write_register(28, (periodo >> 16)& 0xFFFF)
 
 
-set_laser_frequency(10)
+set_laser_frequency(1)
 
 def set_laser_shots(shots):
      if shots < 65535:
@@ -60,7 +60,22 @@ def set_laser_energy_us(delay_us):
      time.sleep(0.1)
      rc.write_register(15, (var >> 16)& 0xFFFF)
 
-set_laser_energy_us(50)
+#set_laser_energy_us(174)
 
+def read_DIO_status():
+    DIO_out=rc.read_register(23)
+    DIO_in=rc.read_register(22)
+
+    binNum ='{0:016b}'.format(DIO_out)
+    Inverter = binNum[0]
+    Flipper_vertical = binNum[1]
+    RAMAN_mode = binNum[2]
+    Flipper_attenuator = binNum[3]
+
+    DIO_in = DIO_in & 0x3F
+    print(Inverter, Flipper_vertical, RAMAN_mode, Flipper_attenuator, DIO_in, DIO_out)
+
+    return Inverter, Flipper_vertical, RAMAN_mode, Flipper_attenuator
+read_DIO_status()
 
 rc.write_register(3, 3)

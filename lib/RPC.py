@@ -126,15 +126,40 @@ class RPCDevice:
                 for key, val in outlet_off_status.items():
                     if key in line:
                         self.state[val] = 0
+    def on(self, outlet):
+        for _ in range(3):
+            self.send_command(f"on {outlet}")
+        if self.status(outlet) == 1:
+            return 1
+        for _ in range(4):
+            self.send_command(f"on {outlet}")
+        if self.status(outlet) == 1:
+            return 1
+        print(f"RPC:ON:ERROR:Outlet {outlet} did not turn ON.")
+        return 0
 
-            print(self.state) 
+    def off(self, outlet):
+        for _ in range(3):
+            self.send_command(f"off {outlet}")
+        if self.status(outlet) == 0:
+            return 0
+        for _ in range(4):
+            self.send_command(f"off {outlet}")
+        if self.status(outlet) == 0:
+            return 0
+        print(f"RPC:OFF:ERROR:Outlet {outlet} did not turn OFF.")
+        return 1
 
-            if self.id >= 0 and self.id <= 6:
-                return self.state[self.id]
-            elif self.id == 0:
-                return sum(1 for s in self.state if s == 1)
-            else:
-                return -1
+    def status(self, outlet):
+        self.serial.flushInput()
+        self.serial.write(b"\r")
+        time.sleep(0.05)
+        if self.id >= 0 and self.id <= 6:
+            return self.state[self.id]
+        elif self.id == 0:
+            return sum(1 for s in self.state if s == 1)
+        else:
+            return -1
 
 if __name__ == "__main__":
     # usage with serial object as parameter
