@@ -119,7 +119,7 @@ class RPCDevice:
                 "6)...vxm       : Off": RPC_VXM
             }
 
-            for line in response.split('\n'):
+            for line in response.split('\n'):                
                 for key, val in outlet_status.items():
                     if key in line:
                         self.state[val] = 1
