@@ -29,7 +29,36 @@ class VXM:
 
         if isinstance(port, str):
             self.port = port
+<<<<<<< HEAD
+            try:
+                self.serial = serial.Serial(self.port, baudrate, timeout=timeout, parity=parity)
+                
+                self.flush_buffers()
+                self.send_command("G")
+                self.send_command("C")
+                self.send_command("V")
+
+                ready = self.read_command()
+                if ready == "R": 
+                    print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
+                else: 
+                    for i in range(0, 10):
+                        ready = self.read_command()
+                        print(f"VXM:CONNECT:Attempt {i}, response: {ready}")
+                        if ready == "R":
+                            print(f"VXM:CONNECT:Connected to {self.port} at {self.baudrate} baud")
+                        else:
+                            print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}. Trying again...")
+                    
+                    print("VXM:CONNECT:ERROR:Maximum number of trial exceeded")
+                    raise TimeoutError
+                    
+            except serial.SerialException as e:
+                print(f"VXM:CONNECT:ERROR:Unable to reach device at {self.port}: {e}")
+                raise e
+=======
             self.serial = serial.Serial(self.port, baudrate, timeout=timeout, parity=parity)
+>>>>>>> 17004b18b577febffcfcc31bd93292ab513cecef
         elif isinstance(port, serial.Serial):
             self.serial = port
             self.port = self.serial.port
