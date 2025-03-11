@@ -39,7 +39,7 @@ def read_serial():
                     seconds=(int(values[0],16)<<16)+int(values[1],16)
                     counter=(int(values[2],16)<<16)+int(values[3],16)*10
                     lenght=(int(values[4],16)<<16)+int(values[5],16)*10
-                    #print(seconds, counter, lenght)
+                    print(seconds, counter, lenght)
                     # Stampa i dati a schermo
                     #print(f"Dati ricevuti: {values}")
                     values=[seconds, counter,lenght]
