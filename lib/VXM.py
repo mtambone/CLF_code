@@ -33,7 +33,7 @@ class VXM:
                 self.serial = serial.Serial(self.port, baudrate, timeout=timeout, parity=parity)
                 
                 self.flush_buffers()
-                self.send_command("E")
+                self.send_command("G")
                 self.send_command("C")
                 self.send_command("V")
 
