@@ -371,3 +371,100 @@ if __name__ == "__main__":
     c.check_temps()
     c.warmup()
     c.fire()
+#        self.flush_buffers()
+#        try:
+#            pulse_width = self.send_command(f"$DPW {pwd}")
+#            if pulse_width:
+#                print(f"CENT:SET_PULSE_WIDTH:Pulse width set: {pulse_width}")
+#
+#                self.check_pwdth()
+#        except Exception as e:
+#            print(f"CENT:SET_PULSE_WIDTH:ERROR:Some problem occurred: {e}")
+#            return -1
+#
+#    def set_mode_old(self):
+#        
+#        try: 
+#
+#            self.flush_buffers()
+#            self.conf_file = '' #CERCARE FILE
+#            with open(self.conf_file, "r") as read_conf:
+#                print(f"CENT:SET_MODE:file {read_conf} open")
+#
+#                for line in read_conf:
+#                    line=line.strip()
+#
+#                    if line.startswith("$"):
+#                        parts = line.split()
+#                    if len(parts) <2:
+#                        continue
+#                    
+#                    print(f"CENT:SET_MODE:command {line}")
+#                    command = self.send_command(line)
+#                    if command:
+#                        print(f"CENT:SET_MODE:command {command} received")
+#
+#                    inquiry = read_conf.readline().strip()
+#                    print(f"CENT:SET_MODE:command {inquiry}")
+#                    response = self.send_command(inquiry)
+#                    if response:
+#                        print(f"CENT:SET_MODE:command {inquiry} received")
+#
+#                    comment = read_conf.readline().strip()
+#                    print(f"CENT:SET_MODE:{comment}")          
+#            
+#            self.flush_buffers()
+#            seriall = self.send_command('$SERIA ?')
+#            if seriall:
+#                print(f"CENT:SET_MODE:SERIAL NUMBER:{seriall}")
+#
+#            self.flush_buffers()
+#            shot_count = self.send_command('$SHOT ?')
+#            if shot_count: 
+#                print(f"CENT:SET_MODE:SHOT COUNT:{shot_count}")
+#
+#            self.flush_buffers()
+#            user_shot = self.send_command('$USHOT ?')
+#            if user_shot:
+#                print(f"CENT:SET_MODE:USER CONTROLLED SHOT COUNTER:{user_shot}")
+#
+#            self.flush_buffers()
+#            h_vers= self.send_command('$HVERS ?')
+#            if h_vers:
+#                print(f"CENT:SET_MODE:HARDWARE VERSION:{h_vers}")
+#
+#            self.flush_buffers()
+#            temps = self.send_command('$TEMPS ?')
+#            if temps:
+#                print(f"CENT:SET_MODE:TEMPERATURES:{temps}")
+#
+#        except FileNotFoundError:
+#            print(f"CENT:SET_MODE:ERROR:file {self.conf_file} not found")
+#
+#        except serial.SerialException as e:
+#            print(f"CENT:SET_MODE:serial error: {e}")
+#
+#    def check_qs_delay_old(self):
+#
+#            self.flush_buffers()
+#
+#            self.qsdelay = -99
+#
+#            try:
+#                delay = self.send_command("$QSDELAY ?")
+#                if delay:
+#                    parts = delay.split()
+#                    if parts == 2 and parts[0]== "QSDELAY":
+#                        try:
+#                            parts[1] = self.qsdelay
+#                            print(f"CENT:CHECHK_QSWITCH_DELAY:{self.qsdelay}")
+#                            return(self.qsdelay)
+#
+#                        except ValueError:
+#                            
+#                            print(f"CENT:CHECK_QSWITCH_DELAY:ERROR:Bytes received: {delay}")
+#                            return -1
+#
+#            except Exception as e:
+#                print(f"CENT_QSWITCH_DELAY:ERROR:Some problem occurred:{e}")
+#                return 0 
