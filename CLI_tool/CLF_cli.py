@@ -86,7 +86,6 @@ class CLF_app(cmd2.Cmd):
 
     rpc = RPCDevice('/dev/ttyr00')  # Modifica la porta se necessario
     laser = Centurion("/dev/ttyr01")
-    laser.connect()
     
     ########add functions##############
 
